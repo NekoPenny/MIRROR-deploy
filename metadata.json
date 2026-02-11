@@ -1,0 +1,8 @@
+{
+  "name": "Copy of test1",
+  "description": "A mental wellness app for tracking emotions, providing AI-driven insights, and personal reflection.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
