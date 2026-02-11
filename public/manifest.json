@@ -1,0 +1,11 @@
+{
+  "name": "Mirror · 情绪与成长伴侣",
+  "short_name": "Mirror",
+  "description": "情绪记录与 AI 陪伴，记录心情、获得洞察，与你一起温柔成长。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#FDFBF7",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN"
+}
