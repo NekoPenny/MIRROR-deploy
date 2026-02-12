@@ -57,9 +57,7 @@ const GrowthSeed: React.FC = () => {
   const mood = currentEntry?.moodType || 'Neutral';
   const initialFallback = getGrowthFallbackForMood(mood);
 
-  // 直接进入 insight 步骤并先显示兜底文案，避免页面长时间空白；API 返回后再更新（按情绪取正向/负向兜底）
-  const [step, setStep] = useState<'loading' | 'insight' | 'selection' | 'planting'>('insight');
-  const [insightText, setInsightText] = useState(initialFallback.insight);
+  const [step, setStep] = useState<'loading' | 'selection' | 'planting'>('selection');
   const [suggestions, setSuggestions] = useState<string[]>(initialFallback.actions);
   const [selectedSeed, setSelectedSeed] = useState<string | null>(null);
 
@@ -79,13 +77,11 @@ const GrowthSeed: React.FC = () => {
                 user.preferences.aiEnabled
             );
             if (cancelled) return;
-            setInsightText(result.insight);
             setSuggestions(result.actions);
         } catch (e) {
             console.error("Failed to generate growth content", e);
             if (!cancelled) {
                 const fallback = getGrowthFallbackForMood(mood);
-                setInsightText(fallback.insight);
                 setSuggestions(fallback.actions);
             }
         }
@@ -93,10 +89,6 @@ const GrowthSeed: React.FC = () => {
     fetchContent();
     return () => { cancelled = true; };
   }, []);
-
-  const handleInsightNext = () => {
-      setStep('selection');
-  };
 
   const handleSkip = () => {
       const entry: MoodEntry = {
@@ -165,50 +157,7 @@ const GrowthSeed: React.FC = () => {
     <BlobBackground mood={currentEntry?.moodType}>
       <div className="flex flex-col h-full min-h-0 relative font-sans overflow-hidden">
         
-        {/* Step 1: The Insight (Clarity Moment) - 进入即显示，不卡在空白加载 */}
-        <AnimatePresence>
-            {step === 'insight' && (
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-                    transition={{ duration: 0.8 }}
-                    className="absolute inset-0 z-40 flex flex-col items-center justify-center px-8 text-center"
-                >
-                    {/* Mist Overlay Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-transparent pointer-events-none"></div>
-
-                    <div className="relative z-10">
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-[0.25em] mb-6 block">
-                            {t('growth.title')}
-                        </span>
-                        
-                        <h1 className="text-2xl font-serif italic text-gray-800 leading-relaxed mb-16">
-                            "{insightText}"
-                        </h1>
-
-                        <div className="flex justify-center">
-                            <button
-                                type="button"
-                                onClick={handleInsightNext}
-                                className="relative overflow-hidden bg-white/30 backdrop-blur-sm border border-white/50 text-[#2D2D2D] font-bold h-16 px-10 shadow-lg select-none active:scale-95 transition-transform crayon-button flex items-center justify-center gap-2"
-                            >
-                                <Sparkles size={16} /> {t('growth.next_to_selection')}
-                            </button>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={handleSkip}
-                            className="mt-6 text-sm font-medium text-gray-500 hover:text-[var(--color-pencil)] transition-colors"
-                        >
-                            {t('growth.skip')}
-                        </button>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-
-        {/* Step 3: Seed Selection */}
+        {/* 目标选择（直接进入，无前置洞察页） */}
         <AnimatePresence>
             {step === 'selection' && (
                 <motion.div 
