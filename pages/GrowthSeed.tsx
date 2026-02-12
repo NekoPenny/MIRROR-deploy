@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sprout, Plus, Sparkles, Check, Flower2 } from 'lucide-react';
+import { ArrowLeft, Sprout, Plus, Sparkles, Flower2 } from 'lucide-react';
 import { useAppContext } from '../App';
 import { AppRoute, MoodEntry } from '../types';
 import BlobBackground from '../components/BlobBackground';
@@ -94,7 +94,7 @@ const GrowthSeed: React.FC = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const handleInsightAbsorbed = () => {
+  const handleInsightNext = () => {
       setStep('selection');
   };
 
@@ -188,15 +188,14 @@ const GrowthSeed: React.FC = () => {
                         </h1>
 
                         <div className="flex justify-center">
-                            <LongPressButton 
-                                onComplete={handleInsightAbsorbed} 
-                                label={t('growth.hold_instruction')} 
-                            />
+                            <button
+                                type="button"
+                                onClick={handleInsightNext}
+                                className="relative overflow-hidden bg-white/30 backdrop-blur-sm border border-white/50 text-[#2D2D2D] font-bold h-16 px-10 shadow-lg select-none active:scale-95 transition-transform crayon-button flex items-center justify-center gap-2"
+                            >
+                                <Sparkles size={16} /> {t('growth.next_to_selection')}
+                            </button>
                         </div>
-                        
-                        <p className="text-xs text-gray-400 mt-4 font-medium opacity-60">
-                             {t('growth.release_instruction')}
-                        </p>
                         <button
                             type="button"
                             onClick={handleSkip}
@@ -279,6 +278,31 @@ const GrowthSeed: React.FC = () => {
                         </motion.div>
                     </div>
 
+                    {/* 选择目标后：展示所选目标 + 长按确认 */}
+                    {selectedSeed && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-6 p-5 rounded-2xl bg-[#FEFCE8] border-2 border-[#FEF08A] shadow-lg"
+                        >
+                            <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">
+                                {t('growth.selected_goal')}
+                            </p>
+                            <p className="text-base font-bold text-[#451a03] leading-snug mb-4">
+                                {selectedSeed}
+                            </p>
+                            <div className="flex justify-center">
+                                <LongPressButton
+                                    onComplete={handlePlant}
+                                    label={t('growth.hold_instruction')}
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-3 text-center">
+                                {t('growth.release_instruction')}
+                            </p>
+                        </motion.div>
+                    )}
+
                     {/* 视觉指引：完成后在花园中收获花朵 */}
                     <div className="mt-6 mx-2 flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-200/80">
                         <Flower2 size={20} className="text-amber-600 shrink-0" />
@@ -288,17 +312,6 @@ const GrowthSeed: React.FC = () => {
                     </div>
 
                     <div className="mt-auto w-full flex flex-col items-center gap-3">
-                        <motion.button 
-                            onClick={handlePlant}
-                            disabled={!selectedSeed}
-                            whileTap={{ scale: 0.95 }}
-                            className={`
-                                py-4 px-10 font-bold shadow-xl flex items-center gap-2 text-base transition-all duration-500 rounded-full
-                                ${selectedSeed ? 'bg-black text-white translate-y-0 opacity-100' : 'bg-gray-200 text-gray-400 translate-y-10 opacity-0 pointer-events-none'}
-                            `}
-                        >
-                            {t('growth.finish')} <Check size={20} />
-                        </motion.button>
                         <button
                             type="button"
                             onClick={handleSkip}
@@ -340,4 +353,3 @@ const GrowthSeed: React.FC = () => {
 };
 
 export default GrowthSeed;
-
