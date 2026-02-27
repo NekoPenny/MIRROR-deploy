@@ -47,6 +47,9 @@ interface AppContextType {
   currentHeartRate: number;
   showHRAlert: boolean;
   setShowHRAlert: React.Dispatch<React.SetStateAction<boolean>>;
+  /** 开发用：模拟周末以显示每周反思入口 */
+  simulateWeekend: boolean;
+  setSimulateWeekend: React.Dispatch<React.SetStateAction<boolean>>;
   t: (key: string, params?: Record<string, string>) => string;
   toast: string | null;
   showToast: (message: string) => void;
@@ -336,6 +339,7 @@ const App = () => {
   const [watchConnected] = useState(true);
   const [currentHeartRate] = useState(72); // Baseline
   const [showHRAlert, setShowHRAlert] = useState(false);
+  const [simulateWeekend, setSimulateWeekend] = useState(false);
 
   const defaultHistory: MoodEntry[] = [
     {
@@ -377,6 +381,18 @@ const App = () => {
   const clearNewlyHarvested = useCallback((ids?: string[]) => {
     if (ids && ids.length) setNewlyHarvestedIds(prev => prev.filter(x => !ids.includes(x)));
     else setNewlyHarvestedIds([]);
+  }, []);
+
+  // 开发环境：控制台可调用 __MIRROR_SET_HR_ALERT / __MIRROR_SET_WEEKEND（任意页面生效）
+  useEffect(() => {
+    if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
+      (window as any).__MIRROR_SET_HR_ALERT = (show: boolean) => setShowHRAlert(!!show);
+      (window as any).__MIRROR_SET_WEEKEND = (on: boolean) => setSimulateWeekend(!!on);
+      return () => {
+        delete (window as any).__MIRROR_SET_HR_ALERT;
+        delete (window as any).__MIRROR_SET_WEEKEND;
+      };
+    }
   }, []);
 
   // Persist user state to localStorage
@@ -426,7 +442,7 @@ const App = () => {
   };
 
   return (
-    <AppContext.Provider value={{ user, setUser, currentEntry, setCurrentEntry, history, addToHistory, updateEntry, watchConnected, currentHeartRate, showHRAlert, setShowHRAlert, t, toast, showToast, clearToast, newlyHarvestedIds, markNewlyHarvested, clearNewlyHarvested }}>
+    <AppContext.Provider value={{ user, setUser, currentEntry, setCurrentEntry, history, addToHistory, updateEntry, watchConnected, currentHeartRate, showHRAlert, setShowHRAlert, simulateWeekend, setSimulateWeekend, t, toast, showToast, clearToast, newlyHarvestedIds, markNewlyHarvested, clearNewlyHarvested }}>
       <HashRouter>
         <AppContent newUnlock={newUnlock} clearUnlock={() => setNewUnlock(null)} />
       </HashRouter>
